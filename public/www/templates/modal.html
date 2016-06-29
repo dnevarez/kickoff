@@ -1,0 +1,44 @@
+<ion-modal-view>
+
+  <!--  -->
+    <ion-header-bar class="bar bar-header bar-stable">
+        <h1 class="title">Event</h1>
+        <button class="button button-clear button-primary" ng-click="modal.hide(1)">Cancel</button>
+    </ion-header-bar>
+    <ion-content class="padding">
+        <div class="list">
+          <label class="item item-input">
+            <!-- <span class="input-label" placeholer="Event"></span> -->
+            <input ng-model="plan" placeholder="Event" type="text">
+          </label>
+          <button class="button button-full button-positive" ng-click="add(plan)">Add</button>
+        </div>
+    </ion-content>
+</ion-modal-view>
+
+
+
+<!-- This is the modal for scheduling events  -->
+<!-- <ion-modal-view class="slide-in-right">
+    <ion-header-bar class="bar bar-header bar-positive">
+        <h1 class="title">Event</h1>
+        <button class="button button-clear button-primary" ng-click="modal.hide(2)">Cancel</button>
+    </ion-header-bar>
+    <ion-content class="padding">
+        <div class="list">
+          <label class="item item-input">
+            <span class="input-label">Did it work</span>
+            <input ng-model="newUser.firstName" type="text">
+          </label> -->
+          <!-- <label class="item item-input">
+            <span class="input-label">Start</span>
+            <input ng-model="newUser.lastName" type="text">
+          </label>
+          <label class="item item-input">
+            <span class="input-label">{{am}}</span>
+            <input ng-model="newUser.email" type="text"> -->
+          <!-- </label>
+          <button class="button button-full button-positive" ng-click="createContact(newUser)">Create</button>
+        </div>
+    </ion-content>
+</ion-modal-view> -->

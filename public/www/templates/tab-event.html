@@ -1,0 +1,15 @@
+<ion-view view-title="Event">
+    <ion-header-bar class="bar bar-header bar-stable">
+        <h1 class="title">Event</h1>
+        <button class="button button-clear button-primary" ng-click="modal.hide(1)">Cancel</button>
+    </ion-header-bar>
+    <ion-content class="padding">
+        <div class="list">
+          <label class="item item-input">
+            <!-- <span class="input-label" placeholer="Event"></span> -->
+            <input ng-model="plan.event" placeholder="Event" type="text">
+          </label>
+          <button class="button button-full button-positive" ng-click="add(plan)">Add</button>
+        </div>
+    </ion-content>
+</ion-view>

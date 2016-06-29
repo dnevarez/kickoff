@@ -1,0 +1,33 @@
+{
+  "name": "daily-planner",
+  "version": "1.0.0",
+  "description": "Daily Planner: An Ionic project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dnevarez/kickoff.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dnevarez/kickoff/issues"
+  },
+  "homepage": "https://github.com/dnevarez/kickoff#readme",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "mongoose": "^4.5.2"
+  },
+  "cordovaPlugins": [
+    "cordova-plugin-whitelist",
+    "cordova-plugin-console",
+    "cordova-plugin-device",
+    "cordova-plugin-splashscreen"
+  ],
+  "cordovaPlatforms": [
+    "ios"
+  ]
+}

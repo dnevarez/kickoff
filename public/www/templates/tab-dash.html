@@ -1,0 +1,22 @@
+<ion-view view-title="Today" ng-controller="DashCtrl">
+  <ion-content class="padding">
+    hour
+      <div class="calander">
+        <div class="row">
+          <div class="col">
+
+          <div class="row hour"  ng-repeat="am in amhours">
+            <div class="col col-10">{{am}}</div>
+            <div class="col"><ion-item class="hours schedule" ng-click="modal.show(1)">{{plan}}</ion-item></div>
+          </div>
+
+          <div class="row hour"  ng-repeat="pm in pmhours">
+            <div class="col col-10">{{pm}}</div>
+            <div class="col"><ion-item class="hours schedule" ng-click="modal.show(1)"></ion-item></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>
