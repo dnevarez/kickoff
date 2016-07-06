@@ -6,9 +6,11 @@ var sass = require('gulp-sass');
 var minifyCss = require('gulp-minify-css');
 var rename = require('gulp-rename');
 var sh = require('shelljs');
+var less = require('gulp-less');
 
 var paths = {
-  sass: ['./scss/**/*.scss']
+  sass: ['./scss/**/*.scss'],
+  lessSource: ['./public/styles/**/*.less'] //Uncomment if using Less
 };
 
 gulp.task('default', ['sass']);
@@ -24,6 +26,13 @@ gulp.task('sass', function(done) {
     .pipe(rename({ extname: '.min.css' }))
     .pipe(gulp.dest('./www/css/'))
     .on('end', done);
+});
+
+gulp.task('less', function () {       // Uncomment if using Less
+  return gulp.src(paths.lessSource)
+    .pipe(less())
+    .pipe(concat('www/css/style.less'))
+    .pipe(gulp.dest('./public/www/dest/css'));
 });
 
 gulp.task('watch', function() {

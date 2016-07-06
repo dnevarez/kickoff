@@ -5,9 +5,13 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('planner', ['ionic', 'planner.controllers', 'planner.services'])
+// var cal = require(['angular-ios-calendar'], function(res){ return res});
+var ngModule = angular.module('planner', ['ionic','underscore', 'planner.controllers', 'planner.services'])
 
-.run(function($ionicPlatform) {
+// ngModule.constant('moment', require('moment-timezone'))
+
+
+.run(function($ionicPlatform, $rootScope, $location) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -21,7 +25,19 @@ angular.module('planner', ['ionic', 'planner.controllers', 'planner.services'])
       StatusBar.styleDefault();
     }
   });
+  $rootScope.$on('$routeChangeStart', function(event) {
+    if (!Auth.isLoggedIn()) {
+      event.preventDefault();
+      $location.path('/login')
+    } else {
+      $location.path('/dash')
+    }
+  })
 })
+
+// .run(function(amMoment) {
+//     amMoment.changeLocale('de');
+// })
 
 .config(function($stateProvider, $urlRouterProvider) {
 
@@ -35,6 +51,18 @@ angular.module('planner', ['ionic', 'planner.controllers', 'planner.services'])
      url: '/login',
      templateUrl: 'templates/login.html',
      controller: 'LoginCtrl'
+   })
+
+   .state('dayview', {
+     url: '/dayview',
+     templateUrl: 'templates/dayTemp.html',
+     controller: 'dayViewCtrl',
+     resolve: {
+       daysEvents: function(planSvc) {
+        //  console.log(planSvc.getPlans())
+         return planSvc.getPlans()
+       }
+     }
    })
 
   // setup an abstract state for the tabs directive
@@ -53,8 +81,18 @@ angular.module('planner', ['ionic', 'planner.controllers', 'planner.services'])
         templateUrl: 'templates/tab-dash.html',
         controller: 'DashCtrl'
       }
-    }
-  })
+    },
+    resolve: {
+      daysEvents: function(planSvc) {
+        console.log(planSvc.getPlans())
+        return planSvc.getPlans()
+      }
+      // userInfoTest: function(userService) {
+      //   console.log(userService.getUserInfo())
+      //   userService.getUserInfo();
+      // }
+  }
+})
 
   .state('tab.event', {
     url: '/event',
@@ -66,11 +104,12 @@ angular.module('planner', ['ionic', 'planner.controllers', 'planner.services'])
     }
   })
 
+
   .state('tab.chats', {
       url: '/chats',
       views: {
         'tab-chats': {
-          templateUrl: 'templates/tab-chats.html',
+          templateUrl: 'templates/calendar.html',
           controller: 'ChatsCtrl'
         }
       }
@@ -85,15 +124,15 @@ angular.module('planner', ['ionic', 'planner.controllers', 'planner.services'])
       }
     })
 
-    .state('tab.login', {
-      url: '/login',
-      views: {
-        'tab-login': {
-          templateUrl: 'templates/login.html',
-          controller: 'loginCtrl'
-        }
-      }
-    })
+    // .state('tab.login', {
+    //   url: '/login',
+    //   views: {
+    //     'tab-login': {
+    //       templateUrl: 'templates/login.html',
+    //       controller: 'loginCtrl'
+    //     }
+    //   }
+    // })
 
   .state('tab.account', {
     url: '/account',

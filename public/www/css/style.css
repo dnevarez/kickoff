@@ -11,15 +11,39 @@ ion-content {
 
 .hours {
   list-style-type: none;
+  width: 100%;
 }
 
 .schedule {
   border: none;
+  width: 100%;
 }
 
+.calendar {
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 95%;
+}
 
+.col-15 {
+  width: 14%;
+  justify-content: center;
+}
+
+.day {
+  border: 1px solid black;
+  border-radius: 100px;
+  margin: 5px;
+  padding: 5px;
+}
+
+/*.smalldot {
+  height: 2px;
+  width: 2px;
+  border: 1px solid green;
+}*/
 /*This is for modal animation*/
-.slide-in-right {
+/*.slide-in-right {
   -webkit-transform: translateX(100%);
     transform: translateX(100%); }
 
@@ -33,4 +57,4 @@ ion-content {
 
 .slide-in-right.ng-leave, .slide-in-right > .ng-leave {
   -webkit-transition: all ease-in-out 250ms;
-  transition: all ease-in-out 250ms; }
+  transition: all ease-in-out 250ms; }*/

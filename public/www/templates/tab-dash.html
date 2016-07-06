@@ -1,19 +1,19 @@
-<ion-view view-title="Today" ng-controller="DashCtrl">
+<ion-view>
+  <ion-nav-title>{{today}}</ion-nav-title>
   <ion-content class="padding">
-    hour
-      <div class="calander">
+
+    <!-- {{today}} -->
+       <div class="calander">
         <div class="row">
           <div class="col">
-
-          <div class="row hour"  ng-repeat="am in amhours">
-            <div class="col col-10">{{am}}</div>
-            <div class="col"><ion-item class="hours schedule" ng-click="modal.show(1)">{{plan}}</ion-item></div>
-          </div>
-
-          <div class="row hour"  ng-repeat="pm in pmhours">
-            <div class="col col-10">{{pm}}</div>
-            <div class="col"><ion-item class="hours schedule" ng-click="modal.show(1)"></ion-item></div>
-          </div>
+              <!-- In order to bind different things to different repeated values,
+              you must use an object. It won't work with primitive values-->
+          <ion-list class="col hour"  ng-repeat="hour in hours track by $index" width="100%" ng-init="event.hour = hour.hour; event.plan = hour.plan">
+            <div class="col" style="flex-wrap: wrap" width="auto" ng-model="event.hour">{{hour.hour}}
+            <!-- <div class="col col-75" style="float: right"> -->
+              <ion-item class="hours schedule col-75" style="" ng-click="openModal(event.hour, event.plan)">{{hour.plan}}</ion-item>
+            </div>
+          </ion-list>
 
         </div>
       </div>

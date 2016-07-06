@@ -2,13 +2,24 @@
   <ion-content class="padding">
       <div class="list list-inset">
 
+          <!-- <div ng-show="register" class="hideByDefault cancel button button-small button-clear button-calm" style="float: right" ng-click="canc()">
+            cancel
+          </div> -->
 
-
-          <label class="item item-input">
+          <label class="item item-input" ng-hide="register">
               <input type="text" placeholder="Username" ng-model="user.username">
           </label>
 
             <!-- Hidden unless you click register -->
+            <label class="item item-input" ng-show="register">
+                <input type="text" placeholder="Username" ng-model="user.username">
+            </label>
+            <label class="item item-input" ng-show="register">
+                <input type="text" placeholder="First Name" ng-model="user.name.first">
+            </label>
+            <label class="item item-input" ng-show="register">
+                <input type="text" placeholder="Last Name" ng-model="user.name.last">
+            </label>
             <label ng-show="register" class="item item-input">
                 <input class="hideByDefault" type="email" placeholder="Email" ng-model="user.email">
             </label>
@@ -19,16 +30,22 @@
 
             <!-- Hidden unless you click register -->
             <label ng-show="register" class="item item-input">
-                <input class="hideByDefault" type="password" placeholder="Confirm Password" ng-model="user.passwordcon">
+                <input class="hideByDefault" type="password" placeholder="Confirm Password" ng-model="password">
             </label>
 
       </div>
-      <button class="button button-block button-calm" ng-click="login()">Login</button>
-
-
-        <button ng-click="show()" class="button button-block button-clear button-calm">
+      <!-- GET user and login -->
+      <button ng-hide="register" class="button button-block button-calm" ng-click="login(user)">Login</button>
+      <!-- Create user and login -->
+      <button ng-show="register" class="button button-block button-calm" ng-click="create(user, password)">Create</button>
+      <!-- Reveals inputs to register, hides login button, reveals register button -->
+      <button ng-hide="cancel" ng-click="show()" class="button button-block button-small button-clear button-calm">
           Register
-        </button>
+      </button>
+      <!-- Hides register inputs for regular login -->
+      <button ng-show="register" class="hideByDefault cancel button button-block button-small button-clear button-calm"  ng-click="canc()">
+          Cancel
+      </button>
 
   </ion-content>
 </ion-view>

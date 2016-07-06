@@ -1,16 +1,46 @@
-<ion-view view-title="Calendar">
+
+<ion-view view-title="{{month}}" ng-model="event.date.month">
+
   <ion-content overflow-scroll="false">
-    <div class="row calendar padding" style="flex-wrap: wrap;">
-      <div class="col col-20" >
-
+    <!-- <div class="row calendar padding" style="flex-wrap: wrap;">
+      <div class="col-15" ng-repeat="i in getDays(days) track by $index">
+        {{$index + 1}}
       </div>
 
       </div>
-    </div>
+    </div> -->
+<center>
 
-    <div class="padding center learn-more">
-      <button class="button button-large button-positive icon-left ion-help" ng-click="openModal(2)">Learn more about the phases</button>
-    </div>
+
+    <table class="calendar" cellspacing="0" cellpadding="0">
+ <colgroup span="7"></colgroup>
+
+ <tbody class="calendar">
+   <tr class="days">
+     <th scope="col col-15" title="Sunday">Sun</th>
+     <th scope="col col-15" title="Monday">Mon</th>
+     <th scope="col col-15" title="Tuesday">Tue</th>
+     <th scope="col col-15" title="Wednesday">Wed</th>
+     <th scope="col col-15" title="Thursday">Thu</th>
+     <th scope="col col-15" title="Friday">Fri</th>
+     <th scope="col col-15" title="Saturday">Sat</th>
+   </tr>
+   <tr ng-repeat="week in weeks">
+
+       <td   ng-click="planner(day, {{month}})" ng-repeat="day in week track by $index" ng-model="day" class="day col-15" >
+
+            <a ng-model="day" href="#/dayview">{{day}}</a>
+            <!-- <div class="smalldot">
+
+            </div> -->
+           <!-- After seven iterations a new `<tr>` should be aded -->
+      </td>
+
+   </tr>
+</tbody>
+</table>
+</center>
+
 
   </ion-content>
 </ion-view>

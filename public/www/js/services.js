@@ -51,17 +51,16 @@ angular.module('planner.services', [])
 
 .factory('hoursSvc',function($http){
 
-  var am = [6, 7, 8, 9, 10, 11]
-  var pm = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  var hours = [{hour: 6}, {hour: 7}, {hour: 8}, {hour: 9}, {hour: 10},
+    {hour: 11}, {hour: 12}, {hour: 1}, {hour: 2}, {hour: 3}, {hour: 4},
+    {hour: 5}, {hour: 6}, {hour: 7}, {hour: 8}, {hour: 9}]
+
 
   return {
-    am: function() {
-      return am
+    hours: function() {
+      return hours
     },
 
-    pm: function () {
-      return pm
-    }
 
     // edit: function () {
     //   $http({
@@ -72,12 +71,156 @@ angular.module('planner.services', [])
   }
 })
 
-.factory('loginSvc', function() {
+.factory('loginSvc', function($http, $location) {
   return {
 
-    login: function() {
+    login: function(user) {
+      console.log("login",user.username)
+      $http({
+        method: "GET",
+        url: "http://localhost:3000/login/" + user.username
+        // data: user.username
+      }).then(function(response){
+        console.log(response)
+        console.log(response.data[0])
+        if (response.data[0].password === user.password && response.data[0].username === user.username) {
+          $location.path('#/tab/dash')
+        } else {
+          alert('Either username or password did not match')
+        }
+      })
+    },
 
+    signUp: function(user, password) {
+      console.log("user is ",user);
+
+      if (user.password !== password) {
+        alert('Passwords must match');
+      }
+       $http({
+      method: "POST",
+      url: "http://localhost:3000/signup",
+      data: user
+    }).then(function(response) {
+      console.log(response)
+    })
     }
 
+  }
+})
+
+.service('userService', function ($http, $q, $location) {
+
+  this.getUserInfo = function() {
+
+   return $http({
+     method: "GET",
+     url: '/signup/' + user.username,
+   })
+   .then(function(response) {
+     console.log(response)
+    //  if(!response) $location.path('/login');
+     return $q.when(response.data.name);
+   })
+ }
+})
+
+.service('planSvc', function($http, $q) {
+
+  this.addEvent = function (plan, hour) {
+    event.start = hour;
+    event.plan = plan;
+    console.log(event.plan, event.start)
+    // return $http({
+    //   method: 'POST',
+    //   url: 'http://localhost:3000/event/',
+    //   data: event
+    // }).success(function(response){
+  //   return response.data;
+  // })
+  }
+
+  this.getPlans = function () {
+    return  $http({
+      method: "GET",
+      url: 'http://localhost:3000/event/' + 752016
+    }).then(function(data) {
+      console.log(data.data)
+      return $q.when(data.data)
+    })
+  }
+
+})
+
+.factory('dateGetter', function() {
+
+    var date = new Date(); // Gets full date - GMT
+    var day = date.getDay(); // Gets weekday number. 0-6 ie - Sunday is 0, Thursday is 5
+    var dayDate = date.getDate(); // Gets the today's actual date (not weekday number)
+    var month = date.getMonth(); // Gets month 0-11
+    var year = date.getFullYear(); // Gets year
+
+    var monthStart = new Date(year, month, 1); //gets first day of current month
+    var monthEnd = new Date(year, month + 1, 1); //gets last day of current month
+    var monthLength = (monthEnd - monthStart) / (1000 * 60 * 60 * 24) //gets length of current month
+
+    // var firstDay = monthStart.getDay(); // Gets weekday number for first day of the month
+
+    var startDay = monthStart.getDay(); // Gets weekday number for first day of the month
+
+    // console.log('service', firstDay)
+    var months = ['January', 'February', 'March', 'April',
+    'May', 'June', 'July', 'August', 'September',
+    'October', 'November', 'December'];
+
+    // months[month] + ' ' + dayDate + ' ' + year - example: June 30 2016
+    // month + ' ' + dayDate + ' ' + year - example: 6 30 2016
+
+
+
+    return {
+      date: function () {
+        return date;
+      },
+
+      day: function () {
+        return day;
+      },
+
+      month: function () {
+        for (var i = 0; i < months.length; i++) {
+          if (i === month) {
+            console.log('svc',months[i])
+            var monthName = months[i];
+          }
+        }
+        return monthName;
+      },
+
+      year: function () {
+        return year;
+      },
+
+      monthLength: function () {
+        return monthLength;
+      },
+
+      calDays: function() {
+        var weeks = [];
+        var numWeeks = (monthLength + startDay) / 7
+        for (var i = 0; i <= numWeeks; i++ ) {
+         weeks[i] = [];
+           for(var j = 0; j < 7; j++){
+             if(i == 0 && j < startDay){
+            weeks[i].push(' ');
+             } else{
+               var day = (j - startDay + 1) + (i * 7);
+           // console.log(day)
+               weeks[i].push(day<=monthLength ? day : ' ');
+             }
+          }
+        }
+        return weeks;
+      }
   }
 })

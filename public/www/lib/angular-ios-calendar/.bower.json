@@ -1,0 +1,22 @@
+{
+  "name": "angular-ios-calendar",
+  "version": "0.0.1",
+  "main": "./calendar.js",
+  "dependencies": {},
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components"
+  ],
+  "homepage": "https://github.com/bguiz/angular-ios-calendar",
+  "_release": "0.0.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.0.1",
+    "commit": "e0f0b24a71939faa22f12a887d42f93bbea5f0fd"
+  },
+  "_source": "https://github.com/bguiz/angular-ios-calendar.git",
+  "_target": "^0.0.1",
+  "_originalSource": "angular-ios-calendar",
+  "_direct": true
+}

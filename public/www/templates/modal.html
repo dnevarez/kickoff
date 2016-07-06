@@ -7,11 +7,20 @@
     </ion-header-bar>
     <ion-content class="padding">
         <div class="list">
+
           <label class="item item-input">
-            <!-- <span class="input-label" placeholer="Event"></span> -->
             <input ng-model="plan" placeholder="Event" type="text">
           </label>
-          <button class="button button-full button-positive" ng-click="add(plan)">Add</button>
+
+          <label class="item item-input">
+          Time: <input ng-model="hour" placeholder="Event" type="text" class="col-15" style="padding-left: 5px">
+          </label>
+
+          <!-- <label class="item item-input">
+          End: <input value="hour" placeholder="Enter end time" type="time" min="1" max="12" class="col-15">
+          </label> -->
+
+          <button class="button button-full button-positive" ng-click="add(plan, hour)">Add</button>
         </div>
     </ion-content>
 </ion-modal-view>
