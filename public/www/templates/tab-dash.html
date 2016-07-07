@@ -3,15 +3,15 @@
   <ion-content class="padding">
 
     <!-- {{today}} -->
-       <div class="calander">
+       <div class="to-day" ng-model="event.date">
         <div class="row">
           <div class="col">
               <!-- In order to bind different things to different repeated values,
               you must use an object. It won't work with primitive values-->
-          <ion-list class="col hour"  ng-repeat="hour in hours track by $index" width="100%" ng-init="event.hour = hour.hour; event.plan = hour.plan">
+          <ion-list class="col hour"  ng-repeat="hour in hours track by $index" width="100%" ng-init="event.hour = hour.hour; event.date = da; event.plan = hour.plan; event.ampm = hour.time">
             <div class="col" style="flex-wrap: wrap" width="auto" ng-model="event.hour">{{hour.hour}}
             <!-- <div class="col col-75" style="float: right"> -->
-              <ion-item class="hours schedule col-75" style="" ng-click="openModal(event.hour, event.plan)">{{hour.plan}}</ion-item>
+              <ion-item class="hours schedule col-75" style="" ng-click="openModal(event.hour, event.plan, event.ampm, event.date)">{{hour.plan}}</ion-item>
             </div>
           </ion-list>
 

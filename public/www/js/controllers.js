@@ -33,19 +33,27 @@ angular.module('planner.controllers', [])
 
 .controller('DashCtrl', function($scope, hoursSvc, $ionicModal, planSvc, daysEvents, dateGetter) {
   $scope.hours = hoursSvc.hours();
-  $scope.month = dateGetter.month();
+  $scope.month = dateGetter.monthName();
+  $scope.da = {month: dateGetter.month(), day: dateGetter.dayDate(), year: dateGetter.year()}
+
 
   // $scope.end = hour
 
-  $scope.openModal = function(hour, plan) {
+  $scope.openModal = function(hour, plan, ampm, date) {
+    // console.log('event is ', event)
+    // console.log(hour, plan, ampm, date)
+         $scope.date = date;
          $scope.hour = hour;
          $scope.plan = plan;
+         $scope.ampm = ampm
          $scope.modal.show();
        };
   // console.log(today)
-  $scope.add = function(plan, hour) {
-    console.log(plan, hour)
-    planSvc.addEvent(plan, hour);
+  $scope.add = function(plan, hour, ampm, date) {
+    // console.log('add event', event)
+    // console.log('add',plan, hour, ampm, date)
+    planSvc.addEvent(plan, hour, ampm, date);
+    $scope.modal.hide();
   }
 
   $scope.g = function() {
@@ -61,20 +69,20 @@ angular.module('planner.controllers', [])
     }
   }();
 
-  var hour = function() {
-    let date = new Date();
-    let hour = date.getHours();
-    // console.log(hour)
-  }
+  // var hour = function() {
+  //   let date = new Date();
+  //   let hour = date.getHours();
+  //   // console.log(hour)
+  // }
 
   // Plan
-
+  // Matches plan to proper hour(am/pm).
   $scope.th = daysEvents;
   var plan;
   for (var i = 0; i < daysEvents.length; i++) {
     for (var j = 0; j < $scope.hours.length; j++) {
-      // console.log(daysEvents[i].start, $scope.hours[j])
-      if (daysEvents[i].start === $scope.hours[j].hour) {
+      // console.log(daysEvents[i], $scope.hours[j];
+      if (daysEvents[i].start === $scope.hours[j].hour && daysEvents[i].ampm === $scope.hours[j].time) {
         $scope.hours[j].plan = daysEvents[i].plan
         // console.log($scope.hours[j].plan, $scope.hours[j].hour)
       }
@@ -203,6 +211,7 @@ angular.module('planner.controllers', [])
 // })();
 
 $scope.weeks = dateGetter.calDays();
+// dateGetter.highlightDay($scope.weeks)
 
 
 console.log(dateGetter.calDays())

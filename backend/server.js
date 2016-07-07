@@ -101,8 +101,9 @@ passport.deserializeUser((obj, done) => {
 app.get('/event/:id', eventCtrl.show);
 app.get('/event', eventCtrl.index);
 app.post('/event', eventCtrl.create);
+app.put('/event/:id', eventCtrl.update);
 // app.put('/api/event:id', update);
-// app.delete('/api/event:id', delete);
+app.delete('/event/:id', eventCtrl.delete);
 
 // End points for login/signup
 app.post('/signup', userCtrl.create)

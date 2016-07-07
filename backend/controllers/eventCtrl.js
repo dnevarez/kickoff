@@ -9,7 +9,7 @@ module.exports = {
     Event.create(req.body, function(err, r){
       if (err) {
         console.log(err);
-        return status.res(500).send(err);
+        return res.status(500).send(err);
       }
       res.status(200).json(r);
     })
@@ -38,6 +38,20 @@ module.exports = {
       if(err) console.log(err);
       res.json(collections);
     });
+  },
+
+  update: (req, res, next) => {
+    Event.findByIdAndUpdate(req.params.id, req.body, {new: true}, function (err, r) {
+      if (err) status.res(500).send(err);
+      res.status(200).json(r)
+    })
+  },
+
+  delete: (req, res, next) => {
+    Event.findByIdAndRemove(req.params.id, function(err, r){
+      if (err) status.res(500).send(err);
+      res.status(200).json(r)
+    })
   }
 
 }

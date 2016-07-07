@@ -9,7 +9,8 @@ var eventSchema = {
   },
   plan: {type: String, required: true},
   start: {type: Number, required: true},
-  duration: {type: Number, required: true},
+  ampm: {type: String, required: true},
+  duration: {type: Number},
   searchDate: {type: Number}
 }
 

@@ -1,35 +1,6 @@
 angular.module('planner.services', [])
 
 .factory('Chats', function() {
-  // Might use a resource here that returns a JSON array
-
-  // Some fake testing data
-  var chats = [{
-    id: 0,
-    name: 'Ben Sparrow',
-    lastText: 'You on your way?',
-    face: 'img/ben.png'
-  }, {
-    id: 1,
-    name: 'Max Lynx',
-    lastText: 'Hey, it\'s me',
-    face: 'img/max.png'
-  }, {
-    id: 2,
-    name: 'Adam Bradleyson',
-    lastText: 'I should buy a boat',
-    face: 'img/adam.jpg'
-  }, {
-    id: 3,
-    name: 'Perry Governor',
-    lastText: 'Look at my mukluks!',
-    face: 'img/perry.png'
-  }, {
-    id: 4,
-    name: 'Mike Harrington',
-    lastText: 'This is wicked good ice cream.',
-    face: 'img/mike.png'
-  }];
 
   return {
     all: function() {
@@ -51,24 +22,17 @@ angular.module('planner.services', [])
 
 .factory('hoursSvc',function($http){
 
-  var hours = [{hour: 6}, {hour: 7}, {hour: 8}, {hour: 9}, {hour: 10},
-    {hour: 11}, {hour: 12}, {hour: 1}, {hour: 2}, {hour: 3}, {hour: 4},
-    {hour: 5}, {hour: 6}, {hour: 7}, {hour: 8}, {hour: 9}]
+  var hours = [{hour: 6, time: 'am'}, {hour: 7, time: 'am'}, {hour: 8, time: 'am'}, {hour: 9, time: 'am'}, {hour: 10, time: 'am'},
+    {hour: 11, time: 'am'}, {hour: 12, time: 'pm'}, {hour: 1, time: 'pm'}, {hour: 2, time: 'pm'}, {hour: 3, time: 'pm'}, {hour: 4, time: 'pm'},
+    {hour: 5, time: 'pm'}, {hour: 6, time: 'pm'}, {hour: 7, time: 'pm'}, {hour: 8, time: 'pm'}, {hour: 9, time: 'pm'}]
 
 
   return {
     hours: function() {
       return hours
-    },
+    }
+  };
 
-
-    // edit: function () {
-    //   $http({
-    //     method: "POST",
-    //     url: "/api/day"
-    //   })
-    // }
-  }
 })
 
 .factory('loginSvc', function($http, $location) {
@@ -127,23 +91,33 @@ angular.module('planner.services', [])
 
 .service('planSvc', function($http, $q) {
 
-  this.addEvent = function (plan, hour) {
-    event.start = hour;
-    event.plan = plan;
-    console.log(event.plan, event.start)
-    // return $http({
-    //   method: 'POST',
-    //   url: 'http://localhost:3000/event/',
-    //   data: event
-    // }).success(function(response){
-  //   return response.data;
-  // })
+  var date = new Date(); // Gets full date - GMT
+  var dayDate = date.getDate(); // Gets the today's actual date (not weekday number)
+  var month = date.getMonth(); // Gets month 0-11
+  var year = date.getFullYear(); // Gets year
+  var searchDate = month.toString() + dayDate.toString() + year.toString();
+
+  this.addEvent = function (plan, hour, ampm, date) {
+    var newEvent= {}
+    newEvent.start = hour;
+    newEvent.ampm = ampm;
+    newEvent.plan = plan;
+    newEvent.date = date;
+    newEvent.searchDate = newEvent.date.month.toString() + newEvent.date.day.toString() + newEvent.date.year.toString()
+    // console.log('Service api call', newEvent)
+    return $http({
+      method: 'POST',
+      url: 'http://localhost:3000/event',
+      data: newEvent
+    }).success(function(response){
+    return response.data;
+  })
   }
 
   this.getPlans = function () {
     return  $http({
       method: "GET",
-      url: 'http://localhost:3000/event/' + 752016
+      url: 'http://localhost:3000/event/' + searchDate
     }).then(function(data) {
       console.log(data.data)
       return $q.when(data.data)
@@ -186,8 +160,11 @@ angular.module('planner.services', [])
       day: function () {
         return day;
       },
+      dayDate: function() {
+        return dayDate;
+      },
 
-      month: function () {
+      monthName: function () {
         for (var i = 0; i < months.length; i++) {
           if (i === month) {
             console.log('svc',months[i])
@@ -195,6 +172,10 @@ angular.module('planner.services', [])
           }
         }
         return monthName;
+      },
+
+      month: function() {
+        return month;
       },
 
       year: function () {
@@ -222,5 +203,15 @@ angular.module('planner.services', [])
         }
         return weeks;
       }
+      //
+      // highlightDay: function(weeks) {
+      //   for(var i = 0; i < weeks.length; i++) {
+      //     for (var j = 0; j < weeks[i].length; j++) {
+      //       if (weeks[i][j] === dayDate) {
+      //         weeks[i][j].addclass('')
+      //       }
+      //     }
+      //   }
+      // }
   }
 })
