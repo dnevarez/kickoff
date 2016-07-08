@@ -1,6 +1,10 @@
 <ion-view>
   <ion-nav-title>{{today}}</ion-nav-title>
   <ion-content class="padding">
+    <ion-refresher
+    pulling-text="Pull to refresh..."
+    on-refresh="doRefresh()">
+  </ion-refresher>
 
     <!-- {{today}} -->
        <div class="to-day" ng-model="event.date">
@@ -8,12 +12,19 @@
           <div class="col">
               <!-- In order to bind different things to different repeated values,
               you must use an object. It won't work with primitive values-->
-          <ion-list class="col hour"  ng-repeat="hour in hours track by $index" width="100%" ng-init="event.hour = hour.hour; event.date = da; event.plan = hour.plan; event.ampm = hour.time">
-            <div class="col" style="flex-wrap: wrap" width="auto" ng-model="event.hour">{{hour.hour}}
-            <!-- <div class="col col-75" style="float: right"> -->
-              <ion-item class="hours schedule col-75" style="" ng-click="openModal(event.hour, event.plan, event.ampm, event.date)">{{hour.plan}}</ion-item>
+          <ion-list show-delete="shouldShowDelete" can-swipe="true" class="col hour" style="flex-wrap: wrap"  ng-repeat="hour in hours track by $index" width="100%" ng-init="event.hour = hour.hour; event._id = hour._id; event.date = da; event.plan = hour.plan; event.ampm = hour.time">
+            <div style="row hour" ng-model="event._id">
+              <div class="col col-10" ng-model="event.hour">{{hour.hour}}</div>
+              <div class="col ">
+                <ion-item class="hours schedule" style="" ng-click="openModal(event)">
+                  {{hour.plan}}
+                  <ion-option-button class="button-assertive icon ion-trash-a" ng-click="delete(event._id)"></ion-option-button>
+                </ion-item></div>
             </div>
           </ion-list>
+          <!-- <ion-toggle ng-model="shouldShowDelete">
+            Show Delete?
+          </ion-toggle> -->
 
         </div>
       </div>

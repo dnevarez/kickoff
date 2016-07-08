@@ -5,7 +5,6 @@ var ObjectId = require('mongoose').Types.ObjectId;
 module.exports = {
 
   create: function(req, res, next) {
-    console.log("req is ", req.body)
     Event.create(req.body, function(err, r){
       if (err) {
         console.log(err);
@@ -19,7 +18,7 @@ module.exports = {
     Event.find(req.body, function(err, r) {
       if (err) {
         console.log(err);
-        return status.res(500).send(err);
+        return res.status(500).send(err);
       }
       res.status(200).json(r)
     })
@@ -42,14 +41,14 @@ module.exports = {
 
   update: (req, res, next) => {
     Event.findByIdAndUpdate(req.params.id, req.body, {new: true}, function (err, r) {
-      if (err) status.res(500).send(err);
+      if (err) res.status(500).send(err);
       res.status(200).json(r)
     })
   },
 
   delete: (req, res, next) => {
     Event.findByIdAndRemove(req.params.id, function(err, r){
-      if (err) status.res(500).send(err);
+      if (err) res.status(500).send(err);
       res.status(200).json(r)
     })
   }

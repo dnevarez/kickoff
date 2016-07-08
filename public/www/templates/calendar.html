@@ -1,5 +1,5 @@
 
-<ion-view view-title="{{month}}" ng-model="event.date.month">
+<ion-view view-title="{{month}}" ng-model="month">
 
   <ion-content overflow-scroll="false">
     <!-- <div class="row calendar padding" style="flex-wrap: wrap;">
@@ -27,9 +27,9 @@
    </tr>
    <tr ng-repeat="week in weeks">
 
-       <td   ng-click="planner(day, {{month}})" ng-repeat="day in week track by $index" ng-model="day" class="day col-15" >
-
-            <a ng-model="day" href="#/dayview">{{day}}</a>
+       <td ng-click="planner(day, month)" ng-repeat="day in week track by $index" ng-model="day" class="day col-15" >
+         {{day}}
+            <!-- <a ng-click="planner(day)" ng-model="day" href="#/dayview">{{day}}</a> -->
             <!-- <div class="smalldot">
 
             </div> -->

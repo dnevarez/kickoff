@@ -1,14 +1,14 @@
 <!-- <ion-nav-bar>
   <button ng-click="$ionicGoBack()"><i class="icon ion-ios-arrow-back"></i></button>
 </ion-nav-bar> -->
-<ion-view view-title="Hello">
+<ion-view view-title="{{heading}}">
   <ion-content class="padding">
       <div class="calander">
         <div class="row">
           <div class="col">
 
           <div class="row hour"  ng-repeat="hour in hours track by $index" width="100%" ng-init="event.hour = hour">
-            <div class="col col-10" style="flex-wrap: wrap" width="auto">{{hour.hour}}</div>
+            <div class="col col-10" style="flex-wrap: wrap" width="auto" ng-click="event.hour">{{hour.hour}}</div>
             <div class="col"><ion-item class="hours schedule" ng-click="openModal(hour)">{{plan}}</ion-item></div>
           </div>
 

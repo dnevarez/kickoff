@@ -54,7 +54,7 @@ var ngModule = angular.module('planner', ['ionic','underscore', 'planner.control
    })
 
    .state('dayview', {
-     url: '/dayview',
+     url: '/dayview/?first=day&second=search_date',
      templateUrl: 'templates/dayTemp.html',
      controller: 'dayViewCtrl',
      resolve: {

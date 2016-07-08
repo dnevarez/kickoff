@@ -18,6 +18,7 @@ angular.module('planner.services', [])
       return null;
     }
   };
+
 })
 
 .factory('hoursSvc',function($http){
@@ -65,7 +66,7 @@ angular.module('planner.services', [])
       method: "POST",
       url: "http://localhost:3000/signup",
       data: user
-    }).then(function(response) {
+        }).then(function(response) {
       console.log(response)
     })
     }
@@ -97,21 +98,42 @@ angular.module('planner.services', [])
   var year = date.getFullYear(); // Gets year
   var searchDate = month.toString() + dayDate.toString() + year.toString();
 
-  this.addEvent = function (plan, hour, ampm, date) {
+  this.addOrUpdateEvent = function (plan, hour, ampm, date, _id) {
     var newEvent= {}
     newEvent.start = hour;
     newEvent.ampm = ampm;
     newEvent.plan = plan;
     newEvent.date = date;
     newEvent.searchDate = newEvent.date.month.toString() + newEvent.date.day.toString() + newEvent.date.year.toString()
-    // console.log('Service api call', newEvent)
+    console.log('Service api call', _id)
+    if(!_id) {
+      return $http({
+        method: 'POST',
+        url: 'http://localhost:3000/event/',
+        data: newEvent
+      }).success(function(response){
+        console.log(response)
+      return response.data;
+    })
+  } else {
+      return $http({
+        method: 'PUT',
+        url: 'http://localhost:3000/event/' + _id,
+        data: newEvent
+      }).success(function(response){
+        console.log(response)
+      // return response.data;
+    })
+  }
+}
+
+  this.updateView = function() {
     return $http({
-      method: 'POST',
-      url: 'http://localhost:3000/event',
-      data: newEvent
-    }).success(function(response){
-    return response.data;
-  })
+      method: "GET",
+      url: 'http://localhost:3000/event/' + searchDate
+    }).then(function(response){
+      return response.data;
+    })
   }
 
   this.getPlans = function () {
@@ -119,8 +141,28 @@ angular.module('planner.services', [])
       method: "GET",
       url: 'http://localhost:3000/event/' + searchDate
     }).then(function(data) {
-      console.log(data.data)
+      // console.log(data.data)
       return $q.when(data.data)
+    })
+  }
+
+  this.getDayView = function (search_date) {
+    return $http({
+      method: 'GET',
+      url: 'http://localhost:3000/event/' + search_date
+    }).then(function(response) {
+      console.log(response.data)
+      return response.data;
+    })
+  }
+
+
+  this.delete = function (_id) {
+    return $http({
+      method: "DELETE",
+      url: 'http://localhost:3000/event/' + _id
+    }).then(function(response){
+      console.log(response)
     })
   }
 
@@ -147,9 +189,13 @@ angular.module('planner.services', [])
     'May', 'June', 'July', 'August', 'September',
     'October', 'November', 'December'];
 
+    var monthsAbrv = ['Jan', 'Feb', 'Mar', 'Apr',
+    'May', 'June', 'July', 'Aug', 'Sep',
+    'Oct', 'Nov', 'Dec'];
+
     // months[month] + ' ' + dayDate + ' ' + year - example: June 30 2016
     // month + ' ' + dayDate + ' ' + year - example: 6 30 2016
-
+    var weekdays = ['Sun', 'Mon', 'Tues', 'Wed', 'Thur','Fri','Sat']
 
 
     return {
@@ -160,8 +206,18 @@ angular.module('planner.services', [])
       day: function () {
         return day;
       },
+
       dayDate: function() {
         return dayDate;
+      },
+
+      weekday: function() {
+        for (var i = 0; i < weekdays.length; i++){
+          if (day === weekdays[i]) {
+            console.log(weekdays[i])
+            return weekdays[i]
+          }
+        }
       },
 
       monthName: function () {
@@ -172,6 +228,10 @@ angular.module('planner.services', [])
           }
         }
         return monthName;
+      },
+
+      monthAbr: function() {
+            return monthsAbrv
       },
 
       month: function() {
@@ -214,4 +274,18 @@ angular.module('planner.services', [])
       //   }
       // }
   }
+})
+
+.service('dayViewObj', function() {
+
+    var myObj;
+
+    this.setObj = function (obj) {
+      myObj = obj;
+      console.log(myObj)
+    }
+
+    this.getObj = function () {
+      return myObj;
+    }
 })

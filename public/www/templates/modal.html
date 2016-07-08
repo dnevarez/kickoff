@@ -1,16 +1,10 @@
 <ion-modal-view>
-
-  <!--  -->
     <ion-header-bar class="bar bar-header bar-stable">
         <h1 class="title">Event</h1>
         <button class="button button-clear button-primary" ng-click="modal.hide(1)">Cancel</button>
     </ion-header-bar>
     <ion-content class="padding" ng-model='date'>
-        <div class="list">
-
-          <!-- <label class="item item-input">
-            <input ng-model="date" placeholder="Date" type="text">
-          </label> -->
+        <div class="list" ng-model="_id">
 
           <label class="item item-input">
             <input ng-model="plan" placeholder="Event" type="text">
@@ -24,11 +18,32 @@
             <input ng-model="ampm" placeholder="am/pm" type="text">
           </label>
 
-          <!-- <label class="item item-input">
-          End: <input value="hour" placeholder="Enter end time" type="time" min="1" max="12" class="col-15">
-          </label> -->
+          <button class="button button-full button-positive" ng-click="add(plan, hour, ampm, date, _id)">Add</button>
+        </div>
+    </ion-content>
+</ion-modal-view>
 
-          <button class="button button-full button-positive" ng-click="add(plan, hour, ampm, date)">Add</button>
+<ion-modal-view>
+    <ion-header-bar class="bar bar-header bar-stable">
+        <h1 class="title">Event</h1>
+        <button class="button button-clear button-primary" ng-click="modal.hide(2)">Cancel</button>
+    </ion-header-bar>
+    <ion-content class="padding" ng-model='date'>
+        <div class="list" ng-model="_id">
+
+          <label class="item item-input">
+            <input ng-model="plan" placeholder="Event" type="text">
+          </label>
+
+          <label class="item item-input">
+          Time: <input ng-model="hour" placeholder="Event" type="text" class="col-15" style="padding-left: 5px">
+          </label>
+
+          <label class="item item-input">
+            <input ng-model="ampm" placeholder="am/pm" type="text">
+          </label>
+
+          <button class="button button-full button-positive" ng-click="add(plan, hour, ampm, date, _id)">Add</button>
         </div>
     </ion-content>
 </ion-modal-view>
