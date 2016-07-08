@@ -280,9 +280,10 @@ angular.module('planner.services', [])
 
     var myObj;
 
-    this.setObj = function (obj) {
-      myObj = obj;
-      console.log(myObj)
+    this.setObj = function (response) {
+      myObj = response;
+      return myObj;
+      console.log('myObj is ',myObj)
     }
 
     this.getObj = function () {

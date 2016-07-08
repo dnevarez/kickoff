@@ -219,18 +219,19 @@ angular.module('planner.controllers', [])
   // Plan
 
   var dayViewEvents = function () {
-    $scope.dayViewEvents = dayViewObj.getObj();
-  console.log($scope.dayViewEvents)
-  // for (var i = 0; i < daysEvents.length; i++) {
-  //   for (var j = 0; j < $scope.hours.length; j++) {
-  //     // console.log(daysEvents[i]._id, $scope.hours[j])
-  //     if (daysEvents[i].start === $scope.hours[j].hour) {
-  //       $scope.hours[j].plan = daysEvents[i].plan;
-  //       $scope.hours[j]._id = daysEvents[i]._id
-  //       // console.log($scope.hours[j].plan, $scope.hours[j].hour)
-  //     }
-  //   }
-  // }
+    let dayViewEvents = dayViewObj.getObj();
+    console.log(dayViewEvents)
+    for (var i = 0; i < dayViewEvents.length; i++) {
+      for (var j = 0; j < $scope.hours.length; j++) {
+        // console.log(daysEvents[i]._id, $scope.hours[j])
+        if (dayViewEvents[i].start === $scope.hours[j].hour && dayViewEvents[i].ampm === $scope.hours[j].time) {
+          $scope.hours[j].plan = dayViewEvents[i].plan
+          $scope.hours[j]._id = dayViewEvents[i]._id
+          // $scope.hours[j].hour = dayViewEvents[i].start
+          console.log($scope.hours[j].plan, $scope.hours[j]._id, $scope.hours[j].time)
+        }
+      }
+    }
 }()
 
 
@@ -260,7 +261,7 @@ angular.module('planner.controllers', [])
 
 
 
-.controller('ChatsCtrl', function($scope, dateGetter, $state, planSvc) {
+.controller('ChatsCtrl', function($scope, dateGetter, $state, planSvc, dayViewObj) {
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
   // To listen for when this page is active (for example, to refresh data),
@@ -303,13 +304,11 @@ $scope.planner = function(Day, month) {
   let search_date = $scope.monthNum.toString() + Day.toString() + year.toString();
   // console.log(search_date)
   planSvc.getDayView(search_date).then(function(response){
-    console.log('ctrl',response)
-    $scope.setObj = function(response){
       dayViewObj.setObj(response);
-    }
-  $state.go("dayview", {day: Day, search_date: search_date})
-  })
-}
+      $state.go("dayview", {day: Day, search_date: search_date})
+    })
+  }
+
 
 
 // console.log(days)
