@@ -6,12 +6,13 @@
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
 // var cal = require(['angular-ios-calendar'], function(res){ return res});
-var ngModule = angular.module('planner', ['ionic','underscore', 'planner.controllers', 'planner.services'])
+var ngModule = angular.module('planner', ['ionic','ngStorage', 'planner.controllers', 'planner.services'])
 
 // ngModule.constant('moment', require('moment-timezone'))
 
 
-.run(function($ionicPlatform, $rootScope, $location) {
+.run(function($ionicPlatform, $rootScope, $location, $http, $localStorage) {
+  $http.defaults.headers.common.Authorization = $localStorage.token;
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -26,11 +27,12 @@ var ngModule = angular.module('planner', ['ionic','underscore', 'planner.control
     }
   });
   $rootScope.$on('$routeChangeStart', function(event) {
+    if ($localStorage !== undefined) Auth.isLoggedIn() = true;
     if (!Auth.isLoggedIn()) {
       event.preventDefault();
       $location.path('/login')
     } else {
-      $location.path('/dash')
+      $location.path('/tab/dash')
     }
   })
 })
@@ -39,7 +41,7 @@ var ngModule = angular.module('planner', ['ionic','underscore', 'planner.control
 //     amMoment.changeLocale('de');
 // })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $httpProvider) {
 
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
@@ -58,10 +60,10 @@ var ngModule = angular.module('planner', ['ionic','underscore', 'planner.control
      templateUrl: 'templates/dayTemp.html',
      controller: 'dayViewCtrl',
      resolve: {
-       daysEvents: function(planSvc) {
-        //  console.log(planSvc.getPlans())
-         return planSvc.getPlans()
-       }
+      //  daysEvents: function(planSvc) {
+      //   //  console.log(planSvc.getPlans())
+      //    return planSvc.getPlans()
+      //  }
      }
    })
 
@@ -83,10 +85,10 @@ var ngModule = angular.module('planner', ['ionic','underscore', 'planner.control
       }
     },
     resolve: {
-      daysEvents: function(planSvc) {
-        console.log(planSvc.getPlans())
-        return planSvc.getPlans()
-      }
+      // daysEvents: function(planSvc) {
+      // //   console.log(planSvc.getPlans())
+      //   return planSvc.getPlans()
+      // }
       // userInfoTest: function(userService) {
       //   console.log(userService.getUserInfo())
       //   userService.getUserInfo();
@@ -124,16 +126,6 @@ var ngModule = angular.module('planner', ['ionic','underscore', 'planner.control
       }
     })
 
-    // .state('tab.login', {
-    //   url: '/login',
-    //   views: {
-    //     'tab-login': {
-    //       templateUrl: 'templates/login.html',
-    //       controller: 'loginCtrl'
-    //     }
-    //   }
-    // })
-
   .state('tab.account', {
     url: '/account',
     views: {
@@ -146,5 +138,28 @@ var ngModule = angular.module('planner', ['ionic','underscore', 'planner.control
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/tab/dash');
+
+  // reroute back to signin if no token.
+
+  $httpProvider.interceptors.push(['$q', '$location', '$localStorage', function($q, $location, $localStorage) {
+            return {
+                'request': function (config) {
+                    config.headers = config.headers || {};
+                    if ($localStorage.token) {
+                        // config.headers.Authorization = 'Bearer ' + $localStorage.token;
+                    }
+                    // console.log('headers fired');
+                    // console.log(config.headers.Authorization)
+                    return config;
+                }
+                // 'responseError': function(response) {
+                //     if(response.status === 401 || response.status === 403) {
+                //         $location.path('/login');
+                //     }
+                //     console.log(response)
+                //     return $q.reject(response);
+                // }
+            };
+        }]);
 
 });

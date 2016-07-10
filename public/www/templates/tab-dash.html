@@ -18,7 +18,7 @@
               <div class="col ">
                 <ion-item class="hours schedule" style="" ng-click="openModal(event)">
                   {{hour.plan}}
-                  <ion-option-button class="button-assertive icon ion-trash-a" ng-click="delete(event._id)"></ion-option-button>
+                  <ion-option-button class="button-assertive icon ion-trash-a" ng-click="delete(event._id, event.plan)"></ion-option-button>
                 </ion-item></div>
             </div>
           </ion-list>

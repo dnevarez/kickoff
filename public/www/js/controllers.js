@@ -1,16 +1,71 @@
 angular.module('planner.controllers', [])
+// Controller for login/signup page.
+.controller('LoginCtrl', function($scope, $http, $location, $localStorage, $rootScope, loginSvc, planSvc, dateGetter) {
 
-.controller('LoginCtrl', function($scope, loginSvc) {
-  $scope.user;
-  $scope.password;
 
+ $scope.user;
+ $scope.password
+
+// Login returns user info and assigned token. Error will pop up if user is not found.
   $scope.login = function(user) {
-    loginSvc.login(user);
-  }
+      // user.searchDate = dateGetter.todaysSearchDate();
+      loginSvc.login(user).then(function(res) {
+        console.log(res)
+      if (res.data.token) {
+        $localStorage.token = res.data.token;
+        $localStorage.userId = res.data.user._id;
+        return res
+        // console.log(1, res)
+          // alert(res.data)
+      }
+      // else if (!res.data.token){
+      //   console.log(res.data.message)
+      //   $scope.error = res.data.message
+      // }
 
+      else {
+        // console.log(2, res)
+        $scope.error = res.data.message
+      }
+      }, function() {
+          $rootScope.error = 'Failed to signin';
+    }).then(function(res){
+      $scope.searchDate = dateGetter.todaysSearchDate();
+      var plan = res.data.user.plan
+      console.log(res.data.user)
+      planSvc.getPlans(res.data.user._id)
+      .then(function(response){
+        console.log(response)
+        $localStorage.plans = response
+        window.location = "/#/tab/dash";
+
+      // for (var i = 0; i < response.length; i++) {
+      //   for (var j = 0; j < $scope.hours.length; j++) {
+      //     // console.log(response[i], $scope.hours[j]);
+      //     if (response[i].start === $scope.hours[j].hour && response[i].ampm === $scope.hours[j].time) {
+      //       $scope.hours[j].plan = response[i].plan
+      //       $scope.hours[j]._id = response[i]._id
+      //       console.log($scope.hours[j], $scope.hours[j].plan, $scope.hours[j]._id)
+      //     }
+      //   }
+      // }
+      })
+    })
+    }
+
+// Register new user. Sends info to database,
   $scope.create = function(user, password) {
-    console.log("ctrl ",user, password)
-    loginSvc.signUp(user, password);
+    // console.log("ctrl ",user, password)
+    loginSvc.signUp(user, password).then( function(res) {
+      if (res.data.token) {
+        $localStorage.token = res.data.token;
+        window.location = "/#/tab/dash"
+      } else {
+        window.location = '/'
+      }
+    }, function() {
+          $rootScope.error = 'Failed to signup. All fields required';
+    });
   }
 
   $scope.register = false;
@@ -32,14 +87,15 @@ angular.module('planner.controllers', [])
 })
 
 .controller('DashCtrl', function($scope, $window, $http, hoursSvc, $ionicModal,
-  $ionicListDelegate, planSvc, daysEvents, dateGetter, $state) {
-
+  $ionicListDelegate, planSvc, dateGetter, $state, loginSvc, $localStorage, $rootScope) {
+// console.log(loginSvc.data)
   // Hours months and date object, passed to view in order to be submitted with user
   // info for database.
-
+  var plans = $localStorage.plans
   $scope.hours = hoursSvc.hours();
   $scope.month = dateGetter.monthName();
   $scope.da = {month: dateGetter.month(), day: dateGetter.dayDate(), year: dateGetter.year()}
+  $scope.searchTodaysDate = dateGetter.todaysSearchDate();
 
   // Open modal and pass it the required data needed by database.
 
@@ -62,18 +118,18 @@ angular.module('planner.controllers', [])
     planSvc.addOrUpdateEvent(plan, hour, ampm, date, _id).then(function() {
       planSvc.getPlans()
       .then(function(response) {
-        // console.log(response)
-      for (var i = 0; i < response.length; i++) {
+        console.log(response)
+      for (var i = 0; i < plans.length; i++) {
         for (var j = 0; j < $scope.hours.length; j++) {
           // console.log(response[i], $scope.hours[j]);
-          if (response[i].start === $scope.hours[j].hour && response[i].ampm === $scope.hours[j].time) {
-            $scope.hours[j].plan = response[i].plan
-            $scope.hours[j]._id = response[i]._id
+          if (plans[i].start === $scope.hours[j].hour && plans[i].ampm === $scope.hours[j].time && plans[i].searchDate == $scope.searchTodaysDate) {
+            $scope.hours[j].plan = plans[i].plan
+            $scope.hours[j]._id = plans[i]._id
             console.log($scope.hours[j], $scope.hours[j].plan, $scope.hours[j]._id)
           }
         }
       }
-      $window.location.reload();
+      // $window.location.reload();
     })
       // $state.go($state.current, {}, {reload: true});
 
@@ -83,27 +139,31 @@ angular.module('planner.controllers', [])
 
   // Delete event in the database.
 
-  $scope.delete = function(_id) {
+  $scope.delete = function(_id, plan) {
+    // if ($scope.hours.plan === plan) {
+    //   $scope.hours.plan = ''
+    // };
     planSvc.delete(_id).then(function(res){
-      planSvc.updateView()
-      .then(function(response) {
-        console.log(response)
-        for (var i = 0; i < response.length; i++) {
+
+        $localStorage.plans;
+        // var plans = response
+        for (var i = 0; i < $localStorage.plans.length; i++) {
           for (var j = 0; j < $scope.hours.length; j++) {
             // console.log(response[i], $scope.hours[j]);
-            if (response[i].start === $scope.hours[j].hour && response[i].ampm === $scope.hours[j].time) {
-              $scope.hours[j].plan = response[i].plan
-              $scope.hours[j]._id = response[i]._id
-              console.log($scope.hours[j].plan, $scope.hours[j]._id)
+            if ($localStorage.plans[i].start === $scope.hours[j].hour && $localStorage.plans[i].ampm === $scope.hours[j].time && $localStorage.plans[i].searchDate == $scope.searchTodaysDate) {
+              $scope.hours[j].plan = $localStorage.plans[i].plan
+              $scope.hours[j]._id = $localStorage.plans[i]._id
+              // console.log($scope.hours[j], $scope.hours[j].plan, $scope.hours[j]._id)
             }
           }
         }
-    })
-      $ionicListDelegate.closeOptionButtons();
-      $window.location.reload();
-      })
 
-  }
+      $ionicListDelegate.closeOptionButtons();
+      // $window.location.reload();
+      })
+    }
+
+
 
   // Give the weekday name to number retrieved from getDay function.
 
@@ -123,18 +183,25 @@ angular.module('planner.controllers', [])
 
 
   // Plan
-  // Matches plan to proper hour(am/pm).
+  // Matches plan to proper hour(am/pm) for today.
+  var plans = $localStorage.plans
 
-  for (var i = 0; i < daysEvents.length; i++) {
+  console.log($scope.searchTodaysDate)
+// $rootScope.$on('updateEvents', function(){
+if (!plans){
+  $scope.hours = dateGetter.hours();
+}
+  for (var i = 0; i < plans.length; i++) {
     for (var j = 0; j < $scope.hours.length; j++) {
-      // console.log(daysEvents[i], $scope.hours[j];
-      if (daysEvents[i].start === $scope.hours[j].hour && daysEvents[i].ampm === $scope.hours[j].time) {
-        $scope.hours[j].plan = daysEvents[i].plan
-        $scope.hours[j]._id = daysEvents[i]._id
+      // console.log(plans[i].searchDate, $scope.searchTodaysDate);
+      if (plans[i].start === $scope.hours[j].hour && plans[i].ampm === $scope.hours[j].time && plans[i].searchDate == $scope.searchTodaysDate) {
+        $scope.hours[j].plan = plans[i].plan
+        $scope.hours[j]._id = plans[i]._id
         console.log($scope.hours[j].plan, $scope.hours[j]._id)
       }
     }
   }
+  // })
 
 
   // (function () { console.log('Dash', daysEvents[0], daysEvents[0].start)})()
@@ -329,8 +396,8 @@ $scope.planner = function(Day, month) {
 
  })
 
-.controller('AccountCtrl', function($scope) {
-  $scope.settings = {
-    enableFriends: true
-  };
+.controller('AccountCtrl', function($scope, loginSvc) {
+  $scope.logout = function() {
+    loginSvc.logout();
+  }
 });

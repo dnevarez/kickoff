@@ -4,10 +4,13 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var cors = require('cors');
 var passport = require('passport');
+var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
 // var FacebookStrategy = require('passport-facebook').Strategy;
 var eventCtrl = require('./controllers/eventCtrl');
 var keys = require('./config.json')
 var userCtrl = require('./controllers/user');
+var middleware = require('./controllers/middlewareController');
+
 
 var app = express();
 var corsOptions = {
@@ -15,15 +18,18 @@ var corsOptions = {
 };
 
 mongoose.set("debug", true);
-mongoose.connect('mongodb://localhost/planner');
+mongoose.connect(keys.database);
 mongoose.connection.once("open", function(){
   console.log("Connected to MongoDB");
 });
+app.set('superSecret', keys.appSecret);
 
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
 app.use(express.static(__dirname + '/public'));
 app.use(cors(corsOptions));
 app.use(session({
@@ -33,80 +39,29 @@ app.use(session({
 }));
 
 
-app.use(passport.initialize());
-app.use(passport.session());
+
+// End points for login/signup
+app.post('/signup', userCtrl.create)
+app.post('/login', userCtrl.login)
+app.post('/authenticate', userCtrl.auth);
 
 
-var requireAuth = (req, res, next) => {
-  if(req.isAuthenticated()) {
-    console.log(req.body);
-    return next();
-  }
-  return res.redirect('/login');
-};
+//Everything after the authToken requires a token.
 
-
-var loggedInUser;
-// passport.use(new FacebookStrategy({
-//   clientID: keys.facebookAppId,
-//   clientSecret: keys.facebookSecret,
-//   callbackURL: 'http://localhost:3000/auth/facebook/callback'
-// }, (token, tokenSecret, profile, done) => {
-//
-//   User.findOne({fbID: profile.id}, (err, user) => {
-//
-//     return user;
-//   })
-//   .then((user) => {
-//     if (!user) {
-//       return User.create({
-//         name: profile.displayName,
-//         email: faker.internet.email(),
-//         password: faker.internet.password(),
-//         fbID: profile.id
-//       })
-//     } else {
-//       return user;
-//     }
-//
-//   })
-//   .then(user => {
-//     loggedInUser = user;
-//     done(null, user)
-//   })
-//   .catch(err => { console.log(err) });
-//
-// }))
-
-passport.serializeUser((user, done) => {
-  done(null, user);
-});
-
-passport.deserializeUser((obj, done) => {
-  console.log(obj);
-  done(null, obj);
-});
-
-
-
-
-
-
-
-
+// app.use(middleware.authToken)
 
 
 
 // End points for events.
-app.get('/event/:id', eventCtrl.show);
-app.get('/event', eventCtrl.index);
+// app.get('/event/:id', eventCtrl.show);
+app.get('/event/:user', eventCtrl.index);
 app.post('/event', eventCtrl.create);
 app.put('/event/:id', eventCtrl.update);
-app.delete('/event/:id', eventCtrl.delete);
+app.delete('/delete/:id', eventCtrl.delete);
 
-// End points for login/signup
-app.post('/signup', userCtrl.create)
-app.get('/login/:id', userCtrl.show)
+
+
+
 
 app.listen(3000, function() {
   console.log('The cake is a lie')

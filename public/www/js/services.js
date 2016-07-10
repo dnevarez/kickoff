@@ -36,40 +36,93 @@ angular.module('planner.services', [])
 
 })
 
-.factory('loginSvc', function($http, $location) {
+.factory('loginSvc', function($http, $location, $localStorage, $q) {
+
+  var baseUrl = 'http://localhost:3000'
+  function changeUser(user) {
+            angular.extend(currentUser, user);
+        }
+
+        function urlBase64Decode(str) {
+            var output = str.replace('-', '+').replace('_', '/');
+            switch (output.length % 4) {
+                case 0:
+                    break;
+                case 2:
+                    output += '==';
+                    break;
+                case 3:
+                    output += '=';
+                    break;
+                default:
+                    throw 'Illegal base64url string!';
+            }
+            return window.atob(output);
+        }
+
+        function getUserFromToken() {
+            var token = $localStorage.token;
+            var user = {};
+            if (typeof token !== 'undefined') {
+                var encoded = token.split('.')[1];
+                user = JSON.parse(urlBase64Decode(encoded));
+            }
+            return user;
+        }
+
+        var currentUser = getUserFromToken();
+
+
   return {
 
     login: function(user) {
       console.log("login",user.username)
-      $http({
-        method: "GET",
-        url: "http://localhost:3000/login/" + user.username
-        // data: user.username
-      }).then(function(response){
-        console.log(response)
-        console.log(response.data[0])
-        if (response.data[0].password === user.password && response.data[0].username === user.username) {
-          $location.path('#/tab/dash')
-        } else {
-          alert('Either username or password did not match')
-        }
+      return $http.post(baseUrl + '/authenticate', user).then(function(res){
+        console.log(res);
+        return res
       })
-    },
+    //   $http({
+    //     method: "GET",
+    //     url: "http://localhost:3000/login/",
+    //     data: user
+    // })
+  },
+  // .then(function(response){
+  //   console.log(response)
+  //   console.log(response.data[0])
+  //   if (response.data[0].password === user.password && response.data[0].username === user.username) {
+  //     $location.path('#/tab/dash')
+  //   } else {
+  //     alert('Either username or password did not match')
+  //   }
+  // })
 
     signUp: function(user, password) {
-      console.log("user is ",user);
-
+      // console.log("user is ",user);
       if (user.password !== password) {
         alert('Passwords must match');
       }
-       $http({
-      method: "POST",
-      url: "http://localhost:3000/signup",
-      data: user
-        }).then(function(response) {
-      console.log(response)
-    })
-    }
+      return $http.post(baseUrl + '/signup', user).then(function(response){
+        console.log(response)
+        return response
+      })
+
+    //    $http({
+    //   method: "POST",
+    //   url: "http://localhost:3000/signup",
+    //   data: user
+    //     }).then(function(response) {
+    //   console.log(response)
+    // })
+  },
+
+    logout: function(success) {
+                changeUser({});
+                delete $localStorage.token;
+                delete $localStorage.userid;
+                delete $localStorage.plans;
+                window.location='/#/login';
+            }
 
   }
 })
@@ -84,69 +137,79 @@ angular.module('planner.services', [])
    })
    .then(function(response) {
      console.log(response)
-    //  if(!response) $location.path('/login');
+     if(!response) $location.path('/login');
      return $q.when(response.data.name);
    })
  }
 })
 
-.service('planSvc', function($http, $q) {
+.factory('planSvc', function($http, $q, $localStorage) {
+  var token = $localStorage.token
+  var data = []
 
   var date = new Date(); // Gets full date - GMT
   var dayDate = date.getDate(); // Gets the today's actual date (not weekday number)
   var month = date.getMonth(); // Gets month 0-11
   var year = date.getFullYear(); // Gets year
   var searchDate = month.toString() + dayDate.toString() + year.toString();
+  return {
+    addOrUpdateEvent: function (plan, hour, ampm, date, _id) {
+      var newEvent= {}
+      newEvent.start = hour;
+      newEvent.ampm = ampm;
+      newEvent.plan = plan;
+      newEvent.date = date;
+      newEvent.user = $localStorage.userId
+      newEvent.searchDate = newEvent.date.month.toString() + newEvent.date.day.toString() + newEvent.date.year.toString()
+      console.log('Service api call', _id)
+      if(!_id) {
+        return $http({
+          method: 'POST',
+          url: 'http://localhost:3000/event/',
+          data: newEvent
+        }).success(function(response){
+          console.log(response)
+          $localStorage.plans.push(response)
+        return response.data;
+      })
+    } else {
+        return $http({
+          method: 'PUT',
+          url: 'http://localhost:3000/event/' + _id,
+          data: newEvent
+        }).success(function(response){
+          console.log(response)
+        // return response.data;
+      })
+    }
+  },
 
-  this.addOrUpdateEvent = function (plan, hour, ampm, date, _id) {
-    var newEvent= {}
-    newEvent.start = hour;
-    newEvent.ampm = ampm;
-    newEvent.plan = plan;
-    newEvent.date = date;
-    newEvent.searchDate = newEvent.date.month.toString() + newEvent.date.day.toString() + newEvent.date.year.toString()
-    console.log('Service api call', _id)
-    if(!_id) {
-      return $http({
-        method: 'POST',
-        url: 'http://localhost:3000/event/',
-        data: newEvent
-      }).success(function(response){
-        console.log(response)
-      return response.data;
-    })
-  } else {
-      return $http({
-        method: 'PUT',
-        url: 'http://localhost:3000/event/' + _id,
-        data: newEvent
-      }).success(function(response){
-        console.log(response)
-      // return response.data;
-    })
-  }
-}
-
-  this.updateView = function() {
+  updateView: function(user) {
     return $http({
       method: "GET",
-      url: 'http://localhost:3000/event/' + searchDate
+      url: 'http://localhost:3000/event/' + user
     }).then(function(response){
+      // $localStorage.plans = response;
+
       return response.data;
     })
-  }
+  },
 
-  this.getPlans = function () {
+  getPlans: function (user) {
     return  $http({
       method: "GET",
-      url: 'http://localhost:3000/event/' + searchDate
+      url: 'http://localhost:3000/event/' + user,
+      header: {
+        'x-access-token': token
+      }
     }).then(function(data) {
-      // console.log(data.data)
-      return $q.when(data.data)
-    })
-  }
+      console.log(data.data)
 
-  this.getDayView = function (search_date) {
+      return $q.when(data.data);
+    })
+  },
+
+  getDayView: function (search_date) {
     return $http({
       method: 'GET',
       url: 'http://localhost:3000/event/' + search_date
@@ -154,17 +217,28 @@ angular.module('planner.services', [])
       console.log(response.data)
       return response.data;
     })
-  }
+  },
 
 
-  this.delete = function (_id) {
+  delete: function (_id) {
+    var plan_id = _id
     return $http({
       method: "DELETE",
-      url: 'http://localhost:3000/event/' + _id
+      url: 'http://localhost:3000/delete/' + _id
     }).then(function(response){
       console.log(response)
+      for(var i = 0; i < $localStorage.plans.length; i++) {
+        console.log($localStorage.plans, plan_id)
+        if ($localStorage.plans[i]._id === _id) {
+          $localStorage.plans.splice(i, 1)
+        }
+      }
+      console.log($localStorage.plans)
+      return $localStorage.plans
     })
   }
+
+}
 
 })
 
@@ -183,7 +257,7 @@ angular.module('planner.services', [])
     // var firstDay = monthStart.getDay(); // Gets weekday number for first day of the month
 
     var startDay = monthStart.getDay(); // Gets weekday number for first day of the month
-
+    var todaySearchDate = month.toString() + dayDate.toString() + year.toString();
     // console.log('service', firstDay)
     var months = ['January', 'February', 'March', 'April',
     'May', 'June', 'July', 'August', 'September',
@@ -199,6 +273,9 @@ angular.module('planner.services', [])
 
 
     return {
+      todaysSearchDate: function() {
+        return todaySearchDate;
+      },
       date: function () {
         return date;
       },

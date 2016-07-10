@@ -9,7 +9,7 @@ var userSchema = {
     },
   email: {type: String, required: true, unique: true},
   password: {type: String, required: true, min: 8},
-  day: [ {type: String, ref: 'Day'} ]
+  plan: [ {type: String, ref: 'Event'} ]
 }
 
 module.exports = mongoose.model('User', userSchema)

@@ -11,7 +11,8 @@ var eventSchema = {
   start: {type: Number, required: true},
   ampm: {type: String, required: true},
   duration: {type: Number},
-  searchDate: {type: Number}
+  searchDate: {type: Number},
+  user: {type: String, required: true, ref: 'User'}
 }
 
 module.exports = mongoose.model('Event', eventSchema)

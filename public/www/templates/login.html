@@ -27,6 +27,9 @@
           <label class="item item-input">
               <input type="password" placeholder="Password" ng-model="user.password">
           </label>
+          <center style="background: pink; border-radius: 10px; margin-top: 5px;">
+            {{error}}
+          </center>
 
             <!-- Hidden unless you click register -->
             <label ng-show="register" class="item item-input">
