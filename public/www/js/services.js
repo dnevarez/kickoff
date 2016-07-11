@@ -178,6 +178,7 @@ angular.module('planner.services', [])
           url: 'http://localhost:3000/event/' + _id,
           data: newEvent
         }).success(function(response){
+          $localStorage.plans.push(response)
           console.log(response)
         // return response.data;
       })

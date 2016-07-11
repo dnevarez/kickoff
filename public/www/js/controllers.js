@@ -11,10 +11,9 @@ angular.module('planner.controllers', [])
       // user.searchDate = dateGetter.todaysSearchDate();
       loginSvc.login(user).then(function(res) {
         console.log(res)
-      if (res.data.token) {
-        $localStorage.token = res.data.token;
-        $localStorage.userId = res.data.user._id;
-        return res
+        console.log(res)
+      if (!res.data.token && res.data.success === false) {
+        $scope.error = res.data.message
         // console.log(1, res)
           // alert(res.data)
       }
@@ -25,14 +24,17 @@ angular.module('planner.controllers', [])
 
       else {
         // console.log(2, res)
-        $scope.error = res.data.message
+        $localStorage.token = res.data.token;
+        $localStorage.userId = res.data.user._id;
+        return res
       }
       }, function() {
           $rootScope.error = 'Failed to signin';
     }).then(function(res){
+      if (res === undefined){}
+      else{
       $scope.searchDate = dateGetter.todaysSearchDate();
       var plan = res.data.user.plan
-      console.log(res.data.user)
       planSvc.getPlans(res.data.user._id)
       .then(function(response){
         console.log(response)
@@ -50,6 +52,7 @@ angular.module('planner.controllers', [])
       //   }
       // }
       })
+    }
     })
     }
 
@@ -189,7 +192,8 @@ angular.module('planner.controllers', [])
   console.log($scope.searchTodaysDate)
 // $rootScope.$on('updateEvents', function(){
 if (!plans){
-  $scope.hours = dateGetter.hours();
+  window.location = "/#/login"
+  $scope.hours = hoursSvc.hours();
 }
   for (var i = 0; i < plans.length; i++) {
     for (var j = 0; j < $scope.hours.length; j++) {
@@ -223,7 +227,7 @@ if (!plans){
 })
 
 .controller('dayViewCtrl', function($scope, $stateParams, hoursSvc, $ionicModal, planSvc,
-   daysEvents, dateGetter, dayViewObj) {
+  dateGetter, dayViewObj) {
   $scope.hours = hoursSvc.hours();
   $scope.monthsAbr = dateGetter.monthAbr();
 
