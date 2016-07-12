@@ -1,6 +1,11 @@
 /* Empty. Add your own CSS if you like */
 ion-content {
   /*background: #EEF8FF*/
+  /*background: #F0F8FF */ /*AliceBlue*/
+}
+
+.item-list {
+  height: 3em
 }
 
 .hour {
@@ -36,6 +41,16 @@ ion-content {
   margin: 5px;
   padding: 5px;
 }
+
+.item .item-content {
+  /*padding: 10px !important;*/
+  /*background: #F0F8FF 0!important;*/
+}
+
+/*#login {
+  background: url("Daily-Planner.jpg");
+  z-index: 0;
+}*/
 
 /*.smalldot {
   height: 2px;

@@ -11,7 +11,10 @@ angular.module('planner.controllers', [])
       // user.searchDate = dateGetter.todaysSearchDate();
       loginSvc.login(user).then(function(res) {
         console.log(res)
-        console.log(res)
+        console.log('user is ',user)
+        user.username = ''
+        user.password = ''
+        console.log($scope.user)
       if (!res.data.token && res.data.success === false) {
         $scope.error = res.data.message
         // console.log(1, res)
@@ -100,16 +103,29 @@ angular.module('planner.controllers', [])
   $scope.da = {month: dateGetter.month(), day: dateGetter.dayDate(), year: dateGetter.year()}
   $scope.searchTodaysDate = dateGetter.todaysSearchDate();
 
+
+  $scope.doRefresh = function() {
+    planSvc.updateView()
+     .then(function(plans) {
+      //  $localStorage.plans = plans
+       window.location.reload();
+     })
+     .finally(function() {
+       // Stop the ion-refresher from spinning
+       $scope.$broadcast('scroll.refreshComplete');
+     });
+  };
+
   // Open modal and pass it the required data needed by database.
 
   $scope.openModal = function(plan) {
+
     console.log(plan)
-    // console.log(hour, plan, ampm, date)
-         $scope._id = plan._id;
-         $scope.date = plan.date;
-         $scope.hour = plan.hour;
-         $scope.plan = plan.plan;
-         $scope.ampm = plan.ampm
+         $scope.modal_id = plan._id;
+         $scope.modaldate = plan.date;
+         $scope.modalhour = plan.hour;
+         $scope.modalplan = plan.plan;
+         $scope.modalampm = plan.ampm
          $scope.modal.show();
        };
 
@@ -121,7 +137,9 @@ angular.module('planner.controllers', [])
     planSvc.addOrUpdateEvent(plan, hour, ampm, date, _id).then(function() {
       planSvc.getPlans()
       .then(function(response) {
+        $scope.modalplan = ' '
         console.log(response)
+        console.log($scope.modalplan)
       for (var i = 0; i < plans.length; i++) {
         for (var j = 0; j < $scope.hours.length; j++) {
           // console.log(response[i], $scope.hours[j]);
@@ -137,6 +155,7 @@ angular.module('planner.controllers', [])
       // $state.go($state.current, {}, {reload: true});
 
     })
+    $ionicListDelegate.closeOptionButtons();
     $scope.modal.hide();
   }
 
@@ -160,13 +179,15 @@ angular.module('planner.controllers', [])
             }
           }
         }
-
+        // $ionicListDelegate.update();
       $ionicListDelegate.closeOptionButtons();
-      // $window.location.reload();
       })
+      // $window.location.reload();
     }
 
-
+    $scope.hideEdit= function(){
+      $ionicListDelegate.closeOptionButtons();
+    }
 
   // Give the weekday name to number retrieved from getDay function.
 
@@ -183,6 +204,9 @@ angular.module('planner.controllers', [])
     }
   }();
 
+  if (!$localStorage) {
+    window.location = '/#/login'
+  }
 
 
   // Plan
@@ -191,10 +215,10 @@ angular.module('planner.controllers', [])
 
   console.log($scope.searchTodaysDate)
 // $rootScope.$on('updateEvents', function(){
-if (!plans){
-  window.location = "/#/login"
-  $scope.hours = hoursSvc.hours();
-}
+  if (!plans){
+    window.location = "/#/login"
+    $scope.hours = hoursSvc.hours();
+  }
   for (var i = 0; i < plans.length; i++) {
     for (var j = 0; j < $scope.hours.length; j++) {
       // console.log(plans[i].searchDate, $scope.searchTodaysDate);
@@ -226,28 +250,36 @@ if (!plans){
   });
 })
 
-.controller('dayViewCtrl', function($scope, $stateParams, hoursSvc, $ionicModal, planSvc,
+.controller('dayViewCtrl', function($scope, $stateParams, hoursSvc, $localStorage, $ionicModal, planSvc,
   dateGetter, dayViewObj) {
   $scope.hours = hoursSvc.hours();
   $scope.monthsAbr = dateGetter.monthAbr();
+
+  $scope.weekdays = dateGetter.weekdays();
+
+  let dayViewEvents2 = dayViewObj.getObj();
+  console.log(dayViewEvents2)
 
 
 
   console.log($scope.monthsAbr)
   // $scope.end = hour
 
-  $scope.openModal = function(hour, plan) {
-         $scope.hour = hour;
-         $scope.plan = plan;
+  $scope.openModal = function(plan, hour, ampm, date, _id) {
+    $scope.modal_id = _id;
+    $scope.modaldate = date;
+    $scope.modalhour = hour;
+    $scope.modalplan = plan;
+    $scope.modalampm = ampm
          $scope.modal.show();
        };
   // console.log(today)
   $scope.add = function(plan, hour) {
     console.log(plan, hour)
-    planSvc.addEvent(plan, hour);
+    planSvc.addOrUpdateEvent(plan, hour);
   }
 
-
+  // Gets month and year for dayTemp view
   $scope.m = function() {
     let date = new Date();
     let month = date.getMonth();
@@ -266,6 +298,8 @@ if (!plans){
   $scope.ph = function() {
     let date = new Date();
     let today = date.getDay();
+    let index = dayViewEvents2.idx
+
     $scope.thisDay = $stateParams.day;
     console.log($stateParams.search_date)
     console.log(today)
@@ -278,8 +312,15 @@ if (!plans){
           // console.log($scope.toDay)
           }
         }
-        return $scope.heading = $scope.toDay + ' ' + $scope.monthAbr + ' ' + $scope.thisDay + ', ' + $scope.year
+        for (let i = 0; i < $scope.weekdays.length; i++){
+          if (index === i) {
+            $scope.dayviewDay = $scope.weekdays[i]
+          }
+        }
+        return $scope.heading = $scope.dayviewDay + ' ' + $scope.monthAbr + ' ' + $scope.thisDay + ', ' + $scope.year
     }();
+
+
 
   var hour = function() {
     let date = new Date();
@@ -289,20 +330,30 @@ if (!plans){
 
   // Plan
 
-  var dayViewEvents = function () {
+  var getDayViewEvents = function () {
     let dayViewEvents = dayViewObj.getObj();
     console.log(dayViewEvents)
-    for (var i = 0; i < dayViewEvents.length; i++) {
-      for (var j = 0; j < $scope.hours.length; j++) {
-        // console.log(daysEvents[i]._id, $scope.hours[j])
-        if (dayViewEvents[i].start === $scope.hours[j].hour && dayViewEvents[i].ampm === $scope.hours[j].time) {
-          $scope.hours[j].plan = dayViewEvents[i].plan
-          $scope.hours[j]._id = dayViewEvents[i]._id
-          // $scope.hours[j].hour = dayViewEvents[i].start
-          console.log($scope.hours[j].plan, $scope.hours[j]._id, $scope.hours[j].time)
-        }
+    let searchd = dayViewEvents.search_date;
+    console.log(dayViewEvents.plans)
+    for (let i = 0; i < dayViewEvents.plans.length; i++){
+      if (dayViewEvents.plans[i].search_date === searchd) {
+        console.log(dayViewEvents.plans[i])
+        $scope.modalplan = dayViewEvents.plans[i].plan
+        $scope.modal_id = dayViewEvents.plans[i]._id
+        $scope.modalhour = dayViewEvents.plans[i].hour
       }
     }
+    // for (var i = 0; i < dayViewEvents2.length; i++) {
+    //   for (var j = 0; j < $scope.thishours.length; j++) {
+    //     // console.log(daysEvents[i]._id, $scope.hours[j])
+    //     if (dayViewEvents[i].start === $scope.thishours[j].hour && dayViewEvents2[i].ampm === $scope.thishours[j].time) {
+    //       $scope.thishours[j].plan = dayViewEvents2[i].plan
+    //       $scope.thishours[j]._id = dayViewEvents2[i]._id
+    //       // $scope.hours[j].hour = dayViewEvents2[i].start
+    //       console.log($scope.hours[j].plan, $scope.hours[j]._id, $scope.hours[j].time)
+    //     }
+    //   }
+    // }
 }()
 
 
@@ -332,7 +383,7 @@ if (!plans){
 
 
 
-.controller('ChatsCtrl', function($scope, dateGetter, $state, planSvc, dayViewObj) {
+.controller('ChatsCtrl', function($scope, $filter, $ionicModal, dateGetter, $state, hoursSvc, planSvc, $localStorage, dayViewObj) {
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
   // To listen for when this page is active (for example, to refresh data),
@@ -340,11 +391,12 @@ if (!plans){
   //
   //$scope.$on('$ionicView.enter', function(e) {
   //});
-
+  $scope.thours = hoursSvc.hours()
 
   $scope.month = dateGetter.monthName();
+  var month2 = dateGetter.month();
+  $scope.year = dateGetter.year();
   // console.log($scope.month)
-
   $scope.days = dateGetter.monthLength();
   // console.log($scope.days)
   $scope.getDays = function(days) {
@@ -352,33 +404,123 @@ if (!plans){
   }
   var days = $scope.getDays($scope.days);
   // console.log($scope.days);
+$scope.add = function (date, plan, time){
+  console.log(date)
+  var planObj ={}
+  planObj.date = {}
+  planObj.date.year = $filter('date')(date, "yyyy");
+  planObj.date.day = $filter('date')(date, "d");
+  planObj.date.month = $filter('date')(date, "M");
+  planObj.hour = $filter('date')(time, 'h')
+  planObj.ampm = $filter('date')(time, "a");
 
+  planObj.plan = plan
+
+  var searchDate = (planObj.date.month) + planObj.date.day + planObj.date.year
+  console.log(searchDate)
+  planObj.searchDate = searchDate
+
+  planSvc.addOrUpdateEvent(planObj.plan, planObj.hour, planObj.ampm, planObj.date, planObj.searchDate)
+  .then(function(response){
+    // console.log(response)
+    $localStorage.plans.push(response)
+  })
+  $scope.thisdayview = false;
+}
 
 $scope.weeks = dateGetter.calDays();
 
+$scope.weekdays = dateGetter.weekdays();
+
 // console.log(dateGetter.calDays())
 
-$scope.planner = function(Day, month) {
-  console.log(Day, month)
-  let monthAbrs = dateGetter.monthAbr();
-  let year = dateGetter.year();
-  let monthNum;
-  console.log(monthAbrs, year)
-    for (let i = 0; i < monthAbrs.length; i++) {
-      if (monthAbrs[i] === month){
-        monthNum = i;
-        console.log(monthNum);
-        $scope.monthNum = monthNum
-        console.log($scope.monthNum)
-      }
+$scope.planner =  function(Day){
+  $scope.searchDate = month2.toString() + Day + $scope.year.toString();
+  var viewDayNum = Day + 1
+  var backdate = $scope.year.toString() + '0'+ month2.toString() + viewDayNum;
+  console.log(backdate)
+  var pattern = /(\d{4})(\d{2})(\d{2})/;
+  $scope.date = new Date(backdate.replace(pattern, '$1-$2-$3'))
+  console.log($scope.date)
+
+  for (var i = 0; i < $localStorage.plans.length; i++) {
+    if ($localStorage.plans[i].searchDate === $scope.searchDate) {
+      $scope.hour.plan = $localStorage.plans[i].plan
+      console.log($scope.hours.plan)
+       console.log($localStorage.plans[i])
+
+    }
   }
-  let search_date = $scope.monthNum.toString() + Day.toString() + year.toString();
+  $scope.thisdayview = true
+
+}
+
+$scope.view = function(search) {
+  console.log(search)
+  for (var i = 0; i < $localStorage.plans.length; i++){
+    if($localStorage.plans[i].searchDate === search){
+      console.log($localStorage.plans[i])
+
+    }
+    $scope.modal.show(2)
+  }
+}
+
+$scope.back = function () {
+  window.location = '/#/tab/chats'
+  window.location.reload()
+}
+
+$ionicModal.fromTemplateUrl('templates/modal2.html', {
+  id: '2',
+  scope: $scope,
+  animation: 'scale-in'
+}).then(function(modal) {
+  $scope.modal = modal;
+});
+
+// $scope.planner = function(Day, month, index) {
+//   console.log(Day, month, index)
+//   let monthAbrs = dateGetter.monthAbr();
+//   let year = dateGetter.year();
+//   let monthNum;
+//   let thedayplans = []
+//   console.log(monthAbrs, year)
+//     for (let i = 0; i < monthAbrs.length; i++) {
+//       if (monthAbrs[i] === month){
+//         monthNum = i;
+//         console.log(monthNum);
+//         $scope.monthNum = monthNum
+//         console.log($scope.monthNum)
+//       }
+//   }
+//   console.log($scope.weekdays)
+//   for (let i = 0; i < $scope.weekdays.length; i++){
+//     if (index === i) {
+//       $scope.dayviewDay = $scope.weekdays[i]
+//     }
+//   }
+//   let search_date = $scope.monthNum.toString() + Day.toString() + year.toString();
+//   for (var i = 0; i < $localStorage.plans.length; i++){
+//     if (search_date == $localStorage.plans[i].searchDate){
+  //     thedayplans.push($localStorage.plans[i])
+  //   }
+  // }
+  // $scope.heading = $scope.dayviewDay + ' ' + $scope.monthAbr + ' ' + $scope.thisDay + ', ' + $scope.year
   // console.log(search_date)
-  planSvc.getDayView(search_date).then(function(response){
-      dayViewObj.setObj(response);
-      $state.go("dayview", {day: Day, search_date: search_date})
-    })
-  }
+  //
+  // $scope.thisdayview = true
+  // // planSvc.getDayView(search_date).then(function(response){
+  //     dayViewObj.setObj({day: Day, search_date: search_date, idx: index, plans: thedayplans});
+  //     // $state.go("dayview", {day: Day, search_date: search_date, idx: index, plans: thedayplans})
+  //   }
+
+
+
+// for ( var i = 0; i < $localStorage.plan.length; i++) {
+//   // if ($localStorage.plan[i].searchDate == )
+//   $scope.day.plan = $localStorage.plan
+// }
 
 
 

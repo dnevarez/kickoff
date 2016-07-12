@@ -27,7 +27,7 @@
    </tr>
    <tr ng-repeat="week in weeks">
 
-       <td ng-click="planner(day, month)" ng-repeat="day in week track by $index" ng-model="day" class="day col-15" >
+       <td ng-click="planner(day)" ng-repeat="day in week track by $index" ng-model="day" class="day col-15" >
          {{day}}
             <!-- <a ng-click="planner(day)" ng-model="day" href="#/dayview">{{day}}</a> -->
             <!-- <div class="smalldot">
@@ -39,7 +39,62 @@
    </tr>
 </tbody>
 </table>
+
+
 </center>
+
+
+<div ng-show="thisdayview">
+  <label class="item item-input">
+  <span class="input-label">Date</span>
+  <input type="date" ng-model="date">
+</label>
+  <label class="item item-input">
+    <span class="input-label">Plan</span>
+    <input type="text" ng-model="plan">
+  </label>
+
+<center>
+
+    <label class="item item-input">
+      <div>
+        Time
+      </div>
+      <span class="input-label"></span>
+      <input type="time" ng-model="time">
+    </label>
+  </center>
+
+   <!-- <select>
+    <option style="text-align: center;" value="am">
+      am
+    </option>
+    <option style="text-align: center;" value="pm">
+      pm
+    </option>
+  </select> -->
+  <center>
+
+    <button class="button button-small button-calm button-block col-20" ng-click="add(date, plan, time)">Add</button>
+    <button class="button button-small button-calm buttom-block col-30" ng-model='searchDate' ng-click="view(searchDate)">View</button>
+  </center>
+</div>
+
+<!-- <ion-list ng-show="thisdayview" show-delete="shouldShowDelete" can-swipe="true">
+  <div class="row hour"  ng-repeat="hour in hours track by $index" width="100%">
+    <div class="col col-10" style="flex-wrap: wrap" width="auto" ng-model="hour">{{hour.hour}}</div>
+    <div class="col">
+      <ion-item class="hours schedule list-item" ng-click="openModal(hour)">{{hour.plan}} -->
+      <!-- <ion-option-button class="button-assertive button-small icon ion-edit"></ion-option-button>
+      <ion-option-button class="button-assertive button-small icon ion-trash-a" ng-click="delete(thisevent._id, thisevent.plan)"></ion-option-button> -->
+    <!-- </ion-item>
+    </div>
+  </div>
+</ion-list> -->
+<!-- {{plan}}
+{{hour}}
+{{am}} -->
+
 
 
   </ion-content>

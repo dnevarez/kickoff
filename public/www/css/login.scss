@@ -3,6 +3,12 @@
   display: flex;
   justify-content: center;
 }
+.item{
+  overflow: inherit ;
+  text-overflow: inherit ;
+  white-space: normal ;
+}
+
 
 // .cancel {
 //   height: 5px;

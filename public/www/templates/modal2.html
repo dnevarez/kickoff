@@ -1,0 +1,17 @@
+<ion-modal-view >
+  <div class="icon button ion-ios-arrow-back" ng-click="back()">
+
+  </div>
+<ion-list show-delete="shouldShowDelete" can-swipe="true">
+  <div class="row hour"  ng-repeat="thour in thours track by $index" width="100%">
+    <div class="col col-10" style="flex-wrap: wrap" width="auto" ng-model="event.hour">{{thour.hour}}</div>
+    <div class="col">
+      <ion-item class="hours schedule list-item">{{thour.plan}}
+      <ion-option-button class="button-assertive button-small icon ion-edit"></ion-option-button>
+      <ion-option-button class="button-assertive button-small icon ion-trash-a" ng-click="delete(thisevent._id, thisevent.plan)"></ion-option-button>
+    </ion-item>
+    </div>
+  </div>
+</ion-list>
+
+</ion-modal-view>

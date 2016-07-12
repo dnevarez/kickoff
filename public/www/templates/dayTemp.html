@@ -7,10 +7,29 @@
         <div class="row">
           <div class="col">
 
-          <div class="row hour"  ng-repeat="hour in hours track by $index" width="100%" ng-init="event.hour = hour.hour; event._id = hour._id; event.date = da; event.plan = hour.plan; event.ampm = hour.time">
-            <div class="col col-10" style="flex-wrap: wrap" width="auto" ng-model="event.hour">{{hour.hour}}</div>
-            <div class="col"><ion-item class="hours schedule" ng-click="openModal(hour)">{{plan}}</ion-item></div>
-          </div>
+            <!-- <ion-list show-delete="shouldShowDelete" can-swipe="true" class="col hour">
+              <div style="row hour" ng-model="event._id" ng-repeat="hour in hours track by $index" width="100%" ng-init="event.hour = hour.hour; event._id = hour._id; event.date = da; event.plan = hour.plan; event.ampm = hour.time">
+                <div class="col col-10" style="flex-wrap: wrap" width="auto" ng-model="event.hour">{{hour.hour}}</div>
+                <div class="col">
+                  <ion-item class="hours schedule" style="" ng-click="openModal(event)">
+                    {{hour.plan}}
+                    <ion-option-button class="button-assertive icon ion-trash-a" ng-click="delete(event._id, event.plan)"></ion-option-button>
+                  </ion-item>
+                </div>
+              </div>
+            </ion-list> -->
+
+            <ion-list show-delete="shouldShowDelete" can-swipe="true">
+              <div class="row hour"  ng-repeat="hour in hours track by $index" width="100%">
+                <div class="col col-10" style="flex-wrap: wrap" width="auto" ng-model="event.hour">{{hour.hour}}</div>
+                <div class="col">
+                  <ion-item class="hours schedule list-item" ng-click="openModal(thisevent)">{{hour.plan}}
+                  <ion-option-button class="button-assertive button-small icon ion-edit"></ion-option-button>
+                  <ion-option-button class="button-assertive button-small icon ion-trash-a" ng-click="delete(thisevent._id, thisevent.plan)"></ion-option-button>
+                </ion-item>
+                </div>
+              </div>
+            </ion-list>
 
 
 

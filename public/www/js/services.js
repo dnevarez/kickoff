@@ -117,11 +117,13 @@ angular.module('planner.services', [])
   },
 
     logout: function(success) {
-                changeUser({});
+                // changeUser({})
+                // delete $localStorage; // TODO: change $localStorage throughout so it is an object of objects. $localStorage.planner. ... [token or userId or plans, etc]
                 delete $localStorage.token;
-                delete $localStorage.userid;
+                delete $localStorage.userId;
                 delete $localStorage.plans;
                 window.location='/#/login';
+                // window.location.reload();
             }
 
   }
@@ -153,14 +155,15 @@ angular.module('planner.services', [])
   var year = date.getFullYear(); // Gets year
   var searchDate = month.toString() + dayDate.toString() + year.toString();
   return {
-    addOrUpdateEvent: function (plan, hour, ampm, date, _id) {
+    addOrUpdateEvent: function (plan, hour, ampm, date, search, _id) {
       var newEvent= {}
       newEvent.start = hour;
       newEvent.ampm = ampm;
       newEvent.plan = plan;
       newEvent.date = date;
       newEvent.user = $localStorage.userId
-      newEvent.searchDate = newEvent.date.month.toString() + newEvent.date.day.toString() + newEvent.date.year.toString()
+      if (search) newEvent.searchDate = search
+      else newEvent.searchDate = newEvent.date.month.toString() + newEvent.date.day.toString() + newEvent.date.year.toString()
       console.log('Service api call', _id)
       if(!_id) {
         return $http({
@@ -191,7 +194,7 @@ angular.module('planner.services', [])
       url: 'http://localhost:3000/event/' + user
     }).then(function(response){
       // $localStorage.plans = response;
-
+      if (response) $localStorage.plans = response.data;
       return response.data;
     })
   },
@@ -211,13 +214,20 @@ angular.module('planner.services', [])
   },
 
   getDayView: function (search_date) {
-    return $http({
-      method: 'GET',
-      url: 'http://localhost:3000/event/' + search_date
-    }).then(function(response) {
-      console.log(response.data)
-      return response.data;
-    })
+    for (let i = 0; i < $localStorage.plans.length; i++){
+      if ($localStorage.plans[i].searchDate === search_date) {
+        let thisDaysPlans = $localStorage.plans[i];
+        console.log(thisDaysPlans)
+        return thisDaysPlans
+      }
+    }
+    // return $http({
+    //   method: 'GET',
+    //   url: 'http://localhost:3000/event/' + search_date
+    // }).then(function(response) {
+    //   console.log(response.data)
+    //   return response.data;
+    // })
   },
 
 
@@ -287,6 +297,10 @@ angular.module('planner.services', [])
 
       dayDate: function() {
         return dayDate;
+      },
+
+      weekdays: function() {
+        return weekdays
       },
 
       weekday: function() {
@@ -365,6 +379,7 @@ angular.module('planner.services', [])
     }
 
     this.getObj = function () {
+      console.log(myObj)
       return myObj;
     }
 })
